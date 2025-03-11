@@ -11,8 +11,13 @@ const Navbar = ({ user, setUser }) => {
       <div>
         {user ? (
           <>
-            <Link to="/admin" className="mr-4">
-              Admin
+            {user?.role === "admin" && (
+              <Link to="/admin" className="mr-4">
+                Admin
+              </Link>
+            )}
+            <Link to="/profile" className="mr-4">
+              Your Profile
             </Link>
             <button
               onClick={() => {
