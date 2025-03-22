@@ -35,7 +35,7 @@ router.post("/login", async (req, res) => {
         role: user.role, // User's role (admin/user)
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" } // Set token expiration time (1 hour)
+      { expiresIn: "6h" } // Set token expiration time (1 hour)
     );
 
     // Send the token in the response

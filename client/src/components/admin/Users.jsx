@@ -7,8 +7,14 @@ const Users = () => {
 
   useEffect(() => {
     setLoading(true);
+    const token = localStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
     axios
-      .get("http://localhost:5555/api/users")
+      .get("http://localhost:5555/api/users", config)
       .then((res) => {
         setUsers(res.data);
         setLoading(false);
@@ -20,17 +26,29 @@ const Users = () => {
   }, []);
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Users</h2>
+    <div className="max-w-4xl mx-auto p-4">
+      <h2 className="text-3xl font-bold mb-4">All Users</h2>
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center text-lg">Loading...</p>
       ) : (
-        users.map((user) => (
-          <div key={user._id} className="border p-4 rounded mb-2">
-            <h3 className="font-semibold">{user.name}</h3>
-            <p>{user.email}</p>
-          </div>
-        ))
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white shadow-md rounded-lg border">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                <th className="py-2 px-4 text-left">Username</th>
+                <th className="py-2 px-4 text-left">Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user._id} className="border-t">
+                  <td className="py-2 px-4">{user.username}</td>
+                  <td className="py-2 px-4">{user.email}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

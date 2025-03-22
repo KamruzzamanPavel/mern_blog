@@ -47,6 +47,22 @@ router.get("/", async (req, res) => {
   res.json(posts);
 });
 
+// Get one Post
+router.get("/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id).populate(
+      "user",
+      "username email"
+    );
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Update Post (Admin Only)
 router.put("/:id", protect, adminProtect, async (req, res) => {
   const post = await Post.findById(req.params.id);

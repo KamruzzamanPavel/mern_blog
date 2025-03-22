@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import { decodeToken, getToken } from "./utils/auth";
+import PostDetail from "./components/PostDetail";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -21,12 +22,13 @@ const App = () => {
   return (
     <Router>
       <Navbar user={user} setUser={setUser} />
-      <div className="container mx-auto p-4">
+      <div>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/postdetail/:id" element={<PostDetail />} />
           {user?.role === "admin" && (
             <Route path="/admin" element={<AdminDashboard />} />
           )}

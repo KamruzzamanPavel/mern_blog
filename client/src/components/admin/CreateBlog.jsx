@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const CreateBlog = ({ onBlogCreated }) => {
-  const [newPost, setNewPost] = useState({ title: "", content: "" });
+const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
+  const [newPost, setNewPost] = useState(
+    blogToEdit || { title: "", content: "" }
+  );
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
@@ -10,51 +12,39 @@ const CreateBlog = ({ onBlogCreated }) => {
     setNewPost({ ...newPost, [name]: value });
   };
 
-  const handleCreatePost = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const token = localStorage.getItem("token");
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
-      const response = await axios.post(
-        "http://localhost:5555/api/posts",
-        newPost,
-        config
-      );
-
-      // Notify parent component (AdminDashboard) that a new blog was created
-      onBlogCreated(response.data);
-
-      // Reset form fields
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      if (blogToEdit) {
+        await axios.put(
+          `http://localhost:5555/api/posts/${blogToEdit._id}`,
+          newPost,
+          config
+        );
+      } else {
+        await axios.post("http://localhost:5555/api/posts", newPost, config);
+      }
       setNewPost({ title: "", content: "" });
-      alert("Blog created successfully!");
+      refreshBlogs();
+      cancelEdit();
     } catch (err) {
-      console.error("Error creating blog", err);
-      alert("Error creating blog. Please try again.");
+      console.error("Error saving blog", err);
+      alert("Error saving blog. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleCreatePost} className="mb-6">
+    <form onSubmit={handleSubmit} className="mb-6">
       <div className="mb-4">
-        <label
-          htmlFor="title"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Title
-        </label>
+        <label className="block text-sm font-medium text-gray-700">Title</label>
         <input
           type="text"
           name="title"
-          id="title"
           value={newPost.title}
           onChange={handleInputChange}
           required
@@ -62,15 +52,11 @@ const CreateBlog = ({ onBlogCreated }) => {
         />
       </div>
       <div className="mb-4">
-        <label
-          htmlFor="content"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label className="block text-sm font-medium text-gray-700">
           Content
         </label>
         <textarea
           name="content"
-          id="content"
           value={newPost.content}
           onChange={handleInputChange}
           required
@@ -80,10 +66,17 @@ const CreateBlog = ({ onBlogCreated }) => {
       </div>
       <button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        className="bg-blue-500 text-white px-4 py-2 mr-2 rounded"
         disabled={loading}
       >
-        {loading ? "Creating..." : "Create Blog"}
+        {loading ? "Saving..." : blogToEdit ? "Update Blog" : "Create Blog"}
+      </button>
+      <button
+        type="button"
+        className="bg-gray-500 text-white px-4 py-2 rounded"
+        onClick={cancelEdit}
+      >
+        Cancel
       </button>
     </form>
   );
