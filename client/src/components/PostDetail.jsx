@@ -33,7 +33,7 @@ const PostDetail = () => {
     <div className="max-w-3xl mx-auto p-4">
       {post.image && (
         <img
-          src={post.image}
+          src={`http://localhost:5555/uploads/${post.image}`}
           alt={post.title}
           className="w-full h-64 object-cover rounded-md mb-4"
         />

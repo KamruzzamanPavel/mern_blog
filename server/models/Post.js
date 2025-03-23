@@ -7,6 +7,7 @@ const postSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     isPublished: { type: Boolean, default: false },
     isPopular: { type: Boolean, default: false },
+    image: { type: String },
   },
   { timestamps: true }
 );
