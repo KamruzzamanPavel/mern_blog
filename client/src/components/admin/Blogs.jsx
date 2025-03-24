@@ -91,7 +91,7 @@ const Blogs = () => {
                           <img
                             src={`http://localhost:5555/uploads/${blog.image}`} // Adjust image path based on your server setup
                             alt={blog.title}
-                            className="w-16 h-16 object-cover rounded-full"
+                            className="w-10 h-7 object-cover "
                           />
                         ) : (
                           "No Image"

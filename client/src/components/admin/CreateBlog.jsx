@@ -114,7 +114,11 @@ const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Image</label>
         {previewImage && (
-          <img src={previewImage} alt="Preview" className="mb-2 max-h-40" />
+          <img
+            src={`http://localhost:5555/uploads/${previewImage}`}
+            alt="Preview"
+            className="mb-2 max-h-40"
+          />
         )}
         <input
           type="file"

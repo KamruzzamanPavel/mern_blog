@@ -35,13 +35,16 @@ const Users = () => {
           <table className="min-w-full bg-white shadow-md rounded-lg border">
             <thead>
               <tr className="bg-gray-200 text-gray-700">
+                {" "}
+                <th className="py-2 px-4 text-left">SN</th>
                 <th className="py-2 px-4 text-left">Username</th>
                 <th className="py-2 px-4 text-left">Email</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {users.map((user, index) => (
                 <tr key={user._id} className="border-t">
+                  <td className="py-2 px-4">{index + 1}</td>
                   <td className="py-2 px-4">{user.username}</td>
                   <td className="py-2 px-4">{user.email}</td>
                 </tr>
