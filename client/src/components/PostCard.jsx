@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 const PostCard = ({ post }) => {
   const navigate = useNavigate();
-  console.log(post);
 
   return (
     <div className="border p-4 rounded mb-4 shadow-md bg-white">

@@ -40,10 +40,72 @@ const adminProtect = (req, res, next) => {
   next();
 };
 
-// Get all Posts
+// Get paginated Posts
 router.get("/", async (req, res) => {
-  const posts = await Post.find().populate("user", "username email");
-  res.json(posts);
+  const { page = 1, limit = 5 } = req.query; // Default page is 1 and limit is 5
+  try {
+    const options = {
+      page: Number(page),
+      limit: Number(limit),
+    };
+
+    // Get paginated posts with population
+    const posts = await Post.find()
+      .populate("user", "username email")
+      .skip((options.page - 1) * options.limit) // Skip posts for previous pages
+      .limit(options.limit); // Limit the number of posts per page
+
+    // Count total posts for pagination
+    const totalPosts = await Post.countDocuments();
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalPosts / options.limit);
+
+    res.json({
+      posts,
+      totalPages, // Total number of pages
+      currentPage: options.page, // Current page
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/admin", protect, adminProtect, async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const filter = req.query.filter || ""; // Get filter value
+  console.log("Filter received:", filter); // Debugging
+
+  let query = {};
+
+  // Apply filters
+  if (filter === "publishedPopular") {
+    query = { isPublished: true, isPopular: true };
+  } else if (filter === "publishedUnpopular") {
+    query = { isPublished: true, isPopular: false };
+  } else if (filter === "unpublishedPopular") {
+    query = { isPublished: false, isPopular: true };
+  } else if (filter === "unpublishedUnpopular") {
+    query = { isPublished: false, isPopular: false };
+  }
+  console.log("Query:", query); // Debugging
+  try {
+    const totalPosts = await Post.countDocuments(query);
+    const posts = await Post.find(query)
+      .populate("user", "username email")
+      .skip((page - 1) * limit)
+      .limit(limit);
+    console.log("Posts found:", posts.length); // Debugging
+
+    res.json({
+      posts,
+      totalPages: Math.ceil(totalPosts / limit),
+      currentPage: page,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching posts", error });
+  }
 });
 
 // Get one Post
