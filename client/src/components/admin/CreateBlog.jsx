@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
-  // if clicked from create blog
   if (typeof blogToEdit === "boolean") blogToEdit = false;
 
   const [newPost, setNewPost] = useState(
@@ -15,12 +14,20 @@ const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
     }
   );
   const [loading, setLoading] = useState(false);
-  const [previewImage, setPreviewImage] = useState(blogToEdit?.image || null);
+  const [previewImage, setPreviewImage] = useState(
+    blogToEdit?.image
+      ? `http://localhost:5555/uploads/${blogToEdit.image}`
+      : null
+  );
 
   useEffect(() => {
     if (blogToEdit) {
       setNewPost(blogToEdit);
-      setPreviewImage(blogToEdit.image);
+      setPreviewImage(
+        blogToEdit.image
+          ? `http://localhost:5555/uploads/${blogToEdit.image}`
+          : null
+      );
     }
   }, [blogToEdit]);
 
@@ -36,8 +43,10 @@ const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setNewPost({ ...newPost, image: file });
-    setPreviewImage(URL.createObjectURL(file));
+    if (file) {
+      setNewPost({ ...newPost, image: file });
+      setPreviewImage(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -51,8 +60,8 @@ const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
       const formData = new FormData();
       formData.append("title", newPost.title);
       formData.append("content", newPost.content);
-      formData.append("isPublished", newPost.isPublished);
-      formData.append("isPopular", newPost.isPopular);
+      formData.append("isPublished", newPost.isPublished ? "true" : "false");
+      formData.append("isPopular", newPost.isPopular ? "true" : "false");
       if (newPost.image instanceof File) {
         formData.append("image", newPost.image);
       }
@@ -114,11 +123,7 @@ const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Image</label>
         {previewImage && (
-          <img
-            src={`http://localhost:5555/uploads/${previewImage}`}
-            alt="Preview"
-            className="mb-2 max-h-40"
-          />
+          <img src={previewImage} alt="Preview" className="mb-2 max-h-40" />
         )}
         <input
           type="file"

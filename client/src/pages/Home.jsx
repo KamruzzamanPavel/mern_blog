@@ -17,7 +17,7 @@ const Home = () => {
         setTotalPages(res.data.totalPages);
       })
       .catch((err) => console.error("Error fetching posts:", err));
-  }, [page]);
+  }, [page, limit]); // ✅ Added limit as dependency
 
   const handlePageChange = ({ selected }) => {
     setPage(selected + 1);
@@ -30,30 +30,34 @@ const Home = () => {
       </h1>
 
       {/* Render Posts */}
-      <div className="space-y-6">
-        {posts.map((post) => (
-          <PostCard key={post._id} post={post} />
-        ))}
+      <div className="space-y-6 flex flex-col">
+        {posts.length === 0 ? (
+          <p className="text-center text-gray-500">No posts available.</p>
+        ) : (
+          posts.map((post) => <PostCard key={post._id} post={post} />)
+        )}
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-center mt-8">
-        <ReactPaginate
-          pageCount={totalPages}
-          pageRangeDisplayed={3}
-          marginPagesDisplayed={1}
-          onPageChange={handlePageChange}
-          containerClassName="flex space-x-2 bg-white shadow-lg rounded-xl p-2"
-          previousClassName="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-300"
-          nextClassName="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-300"
-          pageClassName="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-300"
-          activeClassName="bg-sky-500 text-white font-bold shadow-md"
-          disabledClassName="opacity-50 cursor-not-allowed"
-          breakClassName="px-4 py-2 text-gray-500"
-          previousLabel="← Prev"
-          nextLabel="Next →"
-        />
-      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8">
+          <ReactPaginate
+            pageCount={totalPages}
+            pageRangeDisplayed={3}
+            marginPagesDisplayed={1}
+            onPageChange={handlePageChange}
+            containerClassName="flex space-x-2 bg-white shadow-lg rounded-xl p-2"
+            previousClassName="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-300"
+            nextClassName="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-300"
+            pageClassName="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-300"
+            activeClassName="bg-sky-500 text-white font-bold shadow-md"
+            disabledClassName="opacity-50 cursor-not-allowed"
+            breakClassName="px-4 py-2 text-gray-500"
+            previousLabel="← Prev"
+            nextLabel="Next →"
+          />
+        </div>
+      )}
     </div>
   );
 };

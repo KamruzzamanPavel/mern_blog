@@ -50,13 +50,14 @@ router.get("/", async (req, res) => {
     };
 
     // Get paginated posts with population
-    const posts = await Post.find()
+    const posts = await Post.find({ isPublished: true })
       .populate("user", "username email")
       .skip((options.page - 1) * options.limit) // Skip posts for previous pages
       .limit(options.limit); // Limit the number of posts per page
 
     // Count total posts for pagination
-    const totalPosts = await Post.countDocuments();
+    const totalPosts = await Post.countDocuments({ isPublished: true });
+    console.log(totalPosts);
 
     // Calculate total pages
     const totalPages = Math.ceil(totalPosts / options.limit);
@@ -146,7 +147,6 @@ router.post(
   }
 );
 
-// Update Post (Admin Only with Image Upload)
 router.put(
   "/:id",
   protect,
@@ -157,6 +157,10 @@ router.put(
       const post = await Post.findById(req.params.id);
       if (!post) return res.status(404).json({ message: "Post not found" });
 
+      // Store old image filename before updating
+      const oldImage = post.image;
+
+      // Update fields
       post.title = req.body.title || post.title;
       post.content = req.body.content || post.content;
       post.isPublished = req.body.isPublished === "true"; // Convert string to boolean
@@ -164,6 +168,18 @@ router.put(
 
       if (req.file) {
         post.image = req.file.filename;
+
+        // Delete old image if it exists
+        if (oldImage) {
+          const oldImagePath = path.join(__dirname, "..", "uploads", oldImage);
+          fs.unlink(oldImagePath, (err) => {
+            if (err) {
+              console.error("Error deleting old image:", err);
+            } else {
+              console.log("Old image deleted successfully");
+            }
+          });
+        }
       }
 
       await post.save();
@@ -174,6 +190,7 @@ router.put(
     }
   }
 );
+
 // Delete Post (Admin Only)
 
 router.delete("/:id", protect, adminProtect, async (req, res) => {
