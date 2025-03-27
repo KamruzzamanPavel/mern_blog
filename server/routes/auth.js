@@ -4,45 +4,79 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const router = express.Router();
 
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../utils/token.js");
+
 // Register
 router.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
+
   try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
     const user = await User.create({ username, email, password });
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    res.status(201).json({ token });
+
+    res.status(201);
   } catch (err) {
+    console.error(err);
     res.status(400).json({ message: "Error registering user" });
   }
 });
 
-// Login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    console.log(user);
 
-  // Find the user by email
-  const user = await User.findOne({ email });
+    if (!user || !(await user.matchPassword(password)))
+      return res.status(401).json({ message: "Invalid credentials" });
 
-  if (user && (await user.matchPassword(password))) {
-    // Create a token that includes user data
-    const token = jwt.sign(
-      {
-        id: user._id, // User's ID
-        username: user.username, // User's username
-        email: user.email, // User's email
-        role: user.role, // User's role (admin/user)
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "6h" } // Set token expiration time (1 hour)
-    );
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    // Send the token in the response
-    res.json({ token });
-  } else {
-    res.status(401).json({ message: "Invalid credentials" });
+    // Store refresh token in HTTP-Only Cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+    });
+
+    res.json({ accessToken });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
+});
+
+router.post("/refresh", (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  // console.log(refreshToken);
+
+  if (!refreshToken) return res.status(401).json({ message: "Unauthorized" });
+
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    async (err, user) => {
+      if (err) return res.status(403).json({ message: "Forbidden" });
+      console.log("inside refresh user:", user);
+      const user_1 = await User.findOne({ email: user.email });
+      const newAccessToken = generateAccessToken(user_1);
+      console.log("new token: ", newAccessToken);
+
+      res.json({ accessToken: newAccessToken });
+    }
+  );
+});
+
+router.post("/logout", (req, res) => {
+  res.clearCookie("refreshToken");
+  res.json({ message: "Logged out" });
 });
 
 module.exports = router;

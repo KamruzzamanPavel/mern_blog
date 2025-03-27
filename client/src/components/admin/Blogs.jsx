@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import CreateBlog from "./CreateBlog";
 import ReactPaginate from "react-paginate";
+import api from "../../utils/api";
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -19,22 +19,14 @@ const Blogs = () => {
     return () => clearTimeout(timeout);
   }, [page, filter]);
 
-  const token = localStorage.getItem("token");
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-
   const fetchBlogs = (currentPage, selectedFilter = filter) => {
     setLoading(true);
-    axios
+    api
       .get(
-        `http://localhost:5555/api/posts/admin?page=${currentPage}&&limit=5&filter=${selectedFilter}`,
-        config
+        `/api/posts/admin?page=${currentPage}&&limit=5&filter=${selectedFilter}`
       )
       .then((res) => {
-        console.log(res.data.posts);
+        // console.log(res.data.posts);
 
         setBlogs(res.data.posts);
         setTotalPages(res.data.totalPages);
@@ -49,10 +41,7 @@ const Blogs = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this blog?")) return;
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5555/api/posts/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/api/posts/${id}`);
       fetchBlogs(page); // Refresh current page
     } catch (err) {
       console.error("Error deleting blog", err);

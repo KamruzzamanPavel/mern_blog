@@ -9,7 +9,7 @@ const protect = (req, res, next) => {
   if (!token) return res.status(401).json({ message: "Not authorized" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.user = decoded.id;
     next();
   } catch (err) {
@@ -19,6 +19,8 @@ const protect = (req, res, next) => {
 
 // Get user profile
 router.get("/", protect, async (req, res) => {
+  // console.log(req);
+
   const user = await User.findById(req.user).select("-password");
   if (!user) return res.status(404).json({ message: "User not found" });
   res.json(user);

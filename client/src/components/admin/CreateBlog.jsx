@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 
+import api from "../../utils/api";
 const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
   if (typeof blogToEdit === "boolean") blogToEdit = false;
 
@@ -54,9 +54,6 @@ const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-
       const formData = new FormData();
       formData.append("title", newPost.title);
       formData.append("content", newPost.content);
@@ -67,13 +64,9 @@ const CreateBlog = ({ blogToEdit, cancelEdit, refreshBlogs }) => {
       }
 
       if (blogToEdit) {
-        await axios.put(
-          `http://localhost:5555/api/posts/${blogToEdit._id}`,
-          formData,
-          config
-        );
+        await api.put(`/api/posts/${blogToEdit._id}`, formData);
       } else {
-        await axios.post("http://localhost:5555/api/posts", formData, config);
+        await api.post("/api/posts", formData);
       }
 
       setNewPost({

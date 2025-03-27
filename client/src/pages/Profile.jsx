@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import api from "../utils/api";
 const Profile = () => {
   const [user, setUser] = useState({});
   const [formData, setFormData] = useState({ username: "", email: "" });
@@ -12,13 +12,12 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const config = { headers: { Authorization: `Bearer ${token}` } };
+        const accessToken = localStorage.getItem("accessToken");
+        console.log(accessToken);
 
-        const response = await axios.get(
-          "http://localhost:5555/api/profile",
-          config
-        );
+        // const config = { headers: { Authorization: `Bearer ${accessToken}` } };
+
+        const response = await api.get("/api/profile");
         setUser(response.data);
         setFormData({
           username: response.data.username,
@@ -43,8 +42,8 @@ const Profile = () => {
     setMessage("");
 
     try {
-      const token = localStorage.getItem("token");
-      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const accessToken = localStorage.getItem("accessToken");
+      const config = { headers: { Authorization: `Bearer ${accessToken}` } };
 
       const response = await axios.put(
         "http://localhost:5555/api/profile",

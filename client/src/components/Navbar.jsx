@@ -6,7 +6,7 @@ const Navbar = ({ user, setUser }) => {
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between">
       <Link to="/" className="text-lg font-bold">
-        MERN Blog
+        Tech Blog
       </Link>
       <div>
         {user ? (

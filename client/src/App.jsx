@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -6,35 +5,53 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
-import { decodeToken, getToken } from "./utils/auth";
 import PostDetail from "./components/PostDetail";
+import { AuthProvider, useAuth } from "./utils/AuthContext";
+import PrivateRoute from "./utils/PrivateRoute";
 
 const App = () => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const token = getToken();
-    if (token) {
-      setUser(decodeToken());
-    }
-  }, []);
-  console.log(user);
   return (
-    <Router>
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
+  );
+};
+
+const AppRoutes = () => {
+  const { user, setUser } = useAuth();
+
+  return (
+    <>
       <Navbar user={user} setUser={setUser} />
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login setUser={setUser} />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
           <Route path="/postdetail/:id" element={<PostDetail />} />
-          {user?.role === "admin" && (
-            <Route path="/admin" element={<AdminDashboard />} />
-          )}
+
+          {/* Protect Admin Route */}
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute role="admin">
+                <AdminDashboard />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </div>
-    </Router>
+    </>
   );
 };
 

@@ -2,19 +2,22 @@ import React, { useState } from "react";
 import axios from "axios";
 import { saveToken, decodeToken } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../utils/AuthContext";
 
-const Login = ({ setUser }) => {
+const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const { data } = await axios.post(
         "http://localhost:5555/api/auth/login",
-        form
+        form,
+        { withCredentials: true } // Allow sending cookies for refresh token
       );
-      saveToken(data.token);
+      saveToken(data.accessToken);
       setUser(decodeToken());
       navigate("/");
     } catch (error) {

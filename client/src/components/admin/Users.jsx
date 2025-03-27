@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -7,14 +7,9 @@ const Users = () => {
 
   useEffect(() => {
     setLoading(true);
-    const token = localStorage.getItem("token");
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    axios
-      .get("http://localhost:5555/api/users", config)
+
+    api
+      .get("/api/users")
       .then((res) => {
         setUsers(res.data);
         setLoading(false);

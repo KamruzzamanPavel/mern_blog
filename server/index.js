@@ -5,14 +5,24 @@ require("dotenv").config();
 const fs = require("fs");
 const uploadDir = "uploads";
 const path = require("path");
+const cookieParser = require("cookie-parser");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
 const app = express();
+
 app.use(express.json());
-app.use(cors());
+
+app.use(cookieParser());
+// app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Explicitly allow your frontend URL
+    credentials: true, // Allow sending cookies and authentication headers
+  })
+);
 
 // Connect to MongoDB
 mongoose

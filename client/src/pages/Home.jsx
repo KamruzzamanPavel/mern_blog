@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PostCard from "../components/PostCard";
+import HeroSection from "../components/HeroSection";
 import ReactPaginate from "react-paginate";
 
 const Home = () => {
@@ -25,6 +26,7 @@ const Home = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+      <HeroSection />
       <h1 className="text-4xl font-bold text-gray-800 mb-6 text-center">
         Recent Blog Posts
       </h1>
