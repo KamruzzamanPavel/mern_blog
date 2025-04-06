@@ -4,7 +4,7 @@ import { logout } from "../utils/auth";
 
 const Navbar = ({ user, setUser }) => {
   return (
-    <nav className="bg-gray-800 text-white p-4 flex justify-between">
+    <nav className="bg-gray-900 text-white p-4 flex justify-between">
       <Link to="/" className="text-lg font-bold">
         Tech Blog
       </Link>

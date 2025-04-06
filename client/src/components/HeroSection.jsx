@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { motion } from "framer-motion";
 
 const HeroSection = () => {
@@ -6,14 +7,14 @@ const HeroSection = () => {
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="bg-gray-900 text-white py-20 px-6 text-center"
+      className="bg-gray-900 text-white py-10 my-5 px-6 text-center"
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="text-4xl md:text-6xl font-bold mb-4"
+          className="text-xl md:text-3xl font-bold mb-4"
         >
           Welcome to My Blog
         </motion.h1>
