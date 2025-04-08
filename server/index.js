@@ -17,10 +17,20 @@ app.use(express.json());
 
 app.use(cookieParser());
 // app.use(cors());
+const allowedOrigins = ["http://localhost:5173", "http://192.168.0.106:5173"];
+
 app.use(
   cors({
-    origin: "http://192.168.0.106:5173", // Explicitly allow your frontend URL
-    credentials: true, // Allow sending cookies and authentication headers
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 
