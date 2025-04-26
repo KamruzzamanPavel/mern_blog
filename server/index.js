@@ -17,7 +17,12 @@ app.use(express.json());
 
 app.use(cookieParser());
 // app.use(cors());
-const allowedOrigins = ["http://localhost:5173", "http://192.168.0.106:5173"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://192.168.0.106:5173",
+  "http://localhost:5174",
+  "http://192.168.0.108:5174",
+];
 
 app.use(
   cors({
